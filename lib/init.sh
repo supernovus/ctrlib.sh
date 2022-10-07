@@ -187,5 +187,11 @@ use_libs_from() {
   fi
 }
 
+# A helper for making a copy of an original function.
+copy_function() {
+  test -n "$(declare -f "$1")" || return 
+  eval "${_/$1/$2}"
+}
+
 CTRLIB_INIT=1
 

@@ -31,9 +31,30 @@ list_containers() {
   fi
 }
 
+declare -A CTRLIB_DALIAS
+
+## TODO: fix the aliases
+container_alias() {
+  [ $# -ne 2 ] && echo "container_alias <alias> <real_container>" && exit 180
+  #echo "container_alias() $1 = $2"
+  CTRLIB_DALIAS[$1]=$2
+  #echo "registered $1 to ${CTRLIB_DALIAS[$1]}"
+  #echo "all aliases: ${CTRLIB_DOCKER_NAMES[@]}"
+}
+
 enter_container() {
   [ "$#" -ne 1 ] && show_help -e enter
-  docker exec -it $1 /bin/bash
+#  echo "enter_container $1"
+#  if [ -n ${CTRLIB_DALIAS[$1]} ]; then
+#    echo " _ found alias for $1"
+#    CN=${CTRLIB_DALIAS[$1]}
+#  else
+#    echo " _ no alias"
+    CN=$1
+#  fi
+#  echo " using > $CN"
+#  exit
+  docker exec -it $CN /bin/bash
 }
 
 clean_docker() {

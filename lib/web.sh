@@ -12,6 +12,7 @@ use_php_container() {
   else
     CTRLIB_PHP_CONTAINER="$1"
   fi
+  #container_alias php $CTRLIB_PHP_CONTAINER
 }
 
 use_nginx_container() {
@@ -20,6 +21,7 @@ use_nginx_container() {
   else
     CTRLIB_NGINX_CONTAINER="$1"
   fi
+  #container_alias nginx $CTRLIB_NGINX_CONTAINER
 }
 
 ## You might want to override this in your individual scripts if needed.

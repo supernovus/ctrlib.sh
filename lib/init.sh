@@ -4,7 +4,7 @@
 
 BASHVER=`echo $BASH_VERSION | awk -F. '{print $1}'`
 
-[ "$BASHVER" -lt 4 ] && echo "Bash version 4 required." && exit 150
+[ "$BASHVER" -lt 4 ] && echo "Bash version 4 or higher required." && exit 150
 
 [ -z "$BASH_SOURCE" ] && echo "Must source init.sh" && exit 101
 
@@ -28,12 +28,15 @@ debug() {
 }
 
 declare -a CTRLIB_APP_LIB_DIRS
+declare -a CTRLIB_APP_CONF_DIRS
 declare -a CTRLIB_CMD_LIST
 declare -A CTRLIB_CMD_METHODS
 declare -A CTRLIB_CMD_DESC
 declare -A CTRLIB_CMD_HELP
 declare -A CTRLIB_CMD_HELPFUNC
 declare -A CTRLIB_LOADED_LIBS
+
+#declare -A CTRLIB_DALIAS
 
 no_lib() {
   echo "The $1 library is not loaded in $SCRIPTNAME script."
@@ -74,6 +77,7 @@ mark_loaded() {
 }
 
 usage() {
+  local K CN C U
   echo "Usage: sudo $SCRIPTNAME <command> [params...]"
   echo
   echo "Commands:"
@@ -91,8 +95,8 @@ usage() {
 }
 
 show_help() {
-  RETCODE=0
-  CL=
+  local CN RETCODE=0 CL=
+
   [ "$1" = "-e" ] && RETCODE=1 && shift
   [ "$1" = "-c" ] && CL=$2 && shift && shift
   [ -z "$1" ] && usage
@@ -115,7 +119,7 @@ show_help() {
 
 parse_commands() {
   [ $# -lt 1 ] && usage
-  MAINCMD="$1"
+  local MAINCMD="$1"
   shift
   if [ -n "${CTRLIB_CMD_METHODS[$MAINCMD]}" ]; then
     ${CTRLIB_CMD_METHODS[$MAINCMD]} "$@"
@@ -125,20 +129,52 @@ parse_commands() {
   fi
 }
 
+find_source() {
+  [ $# -lt 2 ] && echo "find_source <filename> <dir1> [dir2] ..." && exit 221
+  local tryfile AD AF="$1"
+  shift
+  #echo "looking for $AF" >&2
+  for AD in "$@"; do
+    [ ! -d "$AD" ] && continue
+    tryfile="$AD/$AF"
+    [ -f "$tryfile" ] && echo "$tryfile" && return 0
+  done
+  return 1
+}
+
+## Use one or more libraries and/or config files.
+##
+## Each argument is the name of an item you want to use,
+## or one of the special options:
+##
+## --need   Following items are mandatory.
+## --opt    Following items are optional.
+## --conf   Following items are config files.
+## --lib    Following items are library files.
+##
+## Default options are as if --need --lib was passed.
+##
 use_lib() {
+  local libFile isFatal=1 useConf=0
   while [ "$#" -gt 0 ]; do
-    if [ -f "$CTRLIB_LIB_DIR/$1.sh" ]; then
-      . $CTRLIB_LIB_DIR/$1.sh
+    if [ "$1" = "--need" ]; then
+      isFatal=1
+    elif [ "$1" = "--opt" ]; then 
+      isFatal=0
+    elif [ "$1" = "--conf" ]; then
+      useConf=1
+    elif [ "$1" = "--lib" ]; then 
+      useConf=0
     else
-      _FOUND=0
-      for AD in "${CTRLIB_APP_LIB_DIRS[@]}"; do
-        if [ -f "$AD/$1.sh" ]; then
-          _FOUND=1
-          . $AD/$1.sh
-          break
-        fi
-      done
-      if [ $_FOUND -ne 1 ]; then
+      if [ $useConf -eq 1 ]; then
+        libFile="$(find_source $1.conf ${CTRLIB_APP_CONF_DIRS[@]})"
+      else
+        libFile="$(find_source $1.sh ${CTRLIB_APP_LIB_DIRS[@]})"
+      fi
+
+      if [ -f "$libFile" ]; then 
+        . "$libFile"
+      elif [ $isFatal -eq 1 ]; then
         echo "Could not find $1 library."
         exit 222
       fi
@@ -147,10 +183,27 @@ use_lib() {
   done
 }
 
+## Add an app-specific library directory.
+##
+## By default we only include the main ctrlib libraries.
 use_app_libs() {
   [ $# -ne 1 ] && echo "use_app_libs <path_to_app_libs>" && exit 186
   [ ! -d "$1" ] && echo "use_app_libs: '$1' is not a valid path" && exit 185
   CTRLIB_APP_LIB_DIRS+=($1)
+}
+
+## The default lib dir.
+use_app_libs $CTRLIB_LIB_DIR
+
+## Add an app-specific config directory.
+##
+## Config files are literally the same as libraries, 
+## but have a '.conf' file extension instead of '.sh'.
+##
+use_app_conf() {
+  [ $# -ne 1 ] && echo "use_app_conf <path_to_app_conf>" && exit 186
+  [ ! -d "$1" ] && echo "use_app_conf: '$1' is not a valid path" && exit 185
+  CTRLIB_APP_CONF_DIRS+=($1)
 }
 
 ## Not the same as $HOME; this works with sudo.
@@ -165,19 +218,21 @@ get_home_dir() {
 
 ## The path where our custom settings can be saved
 get_user_config_dir() {
-  HOMEDIR=$(get_home_dir)
+  local HOMEDIR="$(get_home_dir)"
   echo "$HOMEDIR/$CTRLIB_USER_DIR"
 }
 
 ## Enable user libraries by adding '.lib' files to the config dir(s).
 ## First we look in the main config dir, and then in a script-specific sub-dir.
 use_user_libs() {
-  USERLIBS=$(get_user_config_dir)
+  local USERLIBS="$(get_user_config_dir)"
   use_libs_from "$USERLIBS"
   use_libs_from "$USERLIBS/$SCRIPTNAME"
 }
 
+## Get a list of libraries to allow.
 use_libs_from() {
+  local LIBNAME
   if [ -d "$1" ]; then
     for LIBNAME in $1/*.lib; do
       [ -e "$LIBNAME" ] || continue
@@ -194,4 +249,3 @@ copy_function() {
 }
 
 CTRLIB_INIT=1
-

@@ -1,6 +1,6 @@
 ## Web server container functions.
 
-[ -z "$CTRLIB_LIB_DIR" ] && echo "Container init not loaded." && exit 100
+[ -z "$CTRLIB_INIT" ] && echo "Container init not loaded." && exit 100
 
 need docker
 
@@ -46,6 +46,7 @@ reload_php_container() {
   docker exec $1 /bin/bash -c 'kill -USR2 1'
 }
 
+## You can also override individual functions like this one.
 reload_php() {
   [ -n "$CTRLIB_PHP_CONTAINER" -a "$CTRLIB_PHP_CONTAINER" != "0" ] && reload_php_container $CTRLIB_PHP_CONTAINER
 }
@@ -55,6 +56,7 @@ reload_nginx_container() {
   docker exec $1 nginx -s reload
 }
 
+## Or this one.
 reload_nginx() {
   [ -n "$CTRLIB_NGINX_CONTAINER" -a "$CTRLIB_NGINX_CONTAINER" != "0" ] && reload_nginx_container $CTRLIB_NGINX_CONTAINER
 }

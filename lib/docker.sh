@@ -2,7 +2,9 @@
 
 [ -z "$CTRLIB_INIT" ] && echo "Container init not loaded." && exit 100
 
-need_conf CTRLIB_SERVICE_NAME
+need_conf CTRLIB_PROJECT_NAME
+
+declare -gA CTRLIB_DOCKER_ALIAS
 
 if [ -z "$DOCKER_COMPOSE" ]; then
   need_conf CTRLIB_CONTAINER_CONF
@@ -23,6 +25,11 @@ register_compose_commands() {
   register_command 'restart' 'restart_containers_dc' 1 "Restart the $CTRLIB_PROJECT_NAME containers."
 }
 
+register_list_container_aliases() {
+  [ $# -ne 1 ] && "register_list_container_aliases <command_name>" && exit 182
+  register_command "$1" 'list_container_aliases' 1 "List container aliases"
+}
+
 list_containers() {
   if [ "$#" -eq 0 ]; then
     docker ps --format "table {{.ID}}\t{{.Names}}"
@@ -31,29 +38,32 @@ list_containers() {
   fi
 }
 
-declare -A CTRLIB_DALIAS
-
-## TODO: fix the aliases
 container_alias() {
   [ $# -ne 2 ] && echo "container_alias <alias> <real_container>" && exit 180
-  #echo "container_alias() $1 = $2"
-  CTRLIB_DALIAS[$1]=$2
-  #echo "registered $1 to ${CTRLIB_DALIAS[$1]}"
-  #echo "all aliases: ${CTRLIB_DOCKER_NAMES[@]}"
+  CTRLIB_DOCKER_ALIAS[$1]=$2
+}
+
+get_container() {
+  [ "$#" -ne 1 ] && echo "get_container <name>" && exit 181
+  if [ -n "${CTRLIB_DOCKER_ALIAS[$1]}" ]; then
+    echo "${CTRLIB_DOCKER_ALIAS[$1]}"
+  else
+    echo "$1"
+  fi
+}
+
+list_container_aliases() {
+  local key val
+  for key in ${!CTRLIB_DOCKER_ALIAS[@]}
+  do 
+    val=${CTRLIB_DOCKER_ALIAS[$key]}
+    echo "$key => $val"    
+  done
 }
 
 enter_container() {
   [ "$#" -ne 1 ] && show_help -e enter
-#  echo "enter_container $1"
-#  if [ -n ${CTRLIB_DALIAS[$1]} ]; then
-#    echo " _ found alias for $1"
-#    CN=${CTRLIB_DALIAS[$1]}
-#  else
-#    echo " _ no alias"
-    CN=$1
-#  fi
-#  echo " using > $CN"
-#  exit
+  local CN=$(get_container_alias $1)
   docker exec -it $CN /bin/bash
 }
 

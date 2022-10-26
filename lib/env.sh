@@ -1,6 +1,6 @@
 ## Build tools environment commands.
 
-[ -z "$CTRLIB_LIB_DIR" ] && echo "Container init not loaded." && exit 100
+[ -z "$CTRLIB_INIT" ] && echo "Container init not loaded." && exit 100
 
 need docker
 

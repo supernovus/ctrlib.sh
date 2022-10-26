@@ -63,7 +63,7 @@ list_container_aliases() {
 
 enter_container() {
   [ "$#" -ne 1 ] && show_help -e enter
-  local CN=$(get_container_alias $1)
+  local CN=$(get_container $1)
   docker exec -it $CN /bin/bash
 }
 

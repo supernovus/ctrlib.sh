@@ -14,6 +14,8 @@ BASHVER=`echo $BASH_VERSION | awk -F. '{print $1}'`
 
 SCRIPTNAME=`basename $0`
 
+clr() { return; }
+
 case "$TERM" in
   xterm*|linux|ansi|screen)
     . "$CTRLIB_LIB_DIR/colour.sh"

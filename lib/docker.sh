@@ -57,7 +57,7 @@ list_container_aliases() {
   for key in ${!CTRLIB_DOCKER_ALIAS[@]}
   do 
     val=${CTRLIB_DOCKER_ALIAS[$key]}
-    echo "$key => $val"    
+    echo "$(clr cyan)$(pad 20 $key)$(clr end) => $(clr green)$val$(clr end)"    
   done
 }
 

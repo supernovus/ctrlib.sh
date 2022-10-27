@@ -14,6 +14,19 @@ BASHVER=`echo $BASH_VERSION | awk -F. '{print $1}'`
 
 SCRIPTNAME=`basename $0`
 
+case "$TERM" in
+  xterm*|linux|ansi|screen)
+    . "$CTRLIB_LIB_DIR/colour.sh"
+  ;;
+esac
+
+pad() {
+  [ $# -lt 2 ] && echo "pad <length> <string>" && exit 179
+  local len=$1
+  shift
+  printf "%-${len}s" "$@"
+}
+
 no_conf() {
   echo "Missing $1 variable in $SCRIPTNAME script."
   exit 199
@@ -35,8 +48,6 @@ declare -A CTRLIB_CMD_DESC
 declare -A CTRLIB_CMD_HELP
 declare -A CTRLIB_CMD_HELPFUNC
 declare -A CTRLIB_LOADED_LIBS
-
-#declare -A CTRLIB_DALIAS
 
 no_lib() {
   echo "The $1 library is not loaded in $SCRIPTNAME script."
@@ -80,16 +91,16 @@ usage() {
   local K CN C U
   echo "Usage: sudo $SCRIPTNAME <command> [params...]"
   echo
-  echo "Commands:"
+  echo "$(clr bold)Commands:$(clr end)"
   echo
   for K in "${CTRLIB_CMD_LIST[@]}"; do
     CN="${CTRLIB_CMD_METHODS[$K]}"    
-    C=`printf '%-20s' "'$K'"`
+    C=$(clr yellow)$(pad 20 "'$K'")$(clr end)
     U=${CTRLIB_CMD_DESC[$CN]}
     echo " $C $U"
   done
   echo
-  echo "Use the special command 'help <command>' for more help on a command."
+  echo "Use the special command $(clr cyan)'help <command>'$(clr end) for more help on a command."
   echo
   exit 1
 }

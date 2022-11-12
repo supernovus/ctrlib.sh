@@ -1,12 +1,23 @@
 #!/bin/bash
 
+[ -z "$TEST_LUM_CORE" ] && TEST_LUM_CORE=../lum-core
+
+TEST_ROOT="$(dirname $0)"
+TEST_CONF="$TEST_ROOT/_test/conf"
+TEST_LIBS="$TEST_ROOT/_test/lib"
+
 CTRLIB_CONTAINER_CONF=/etc/docker/fakeservice.yaml
 CTRLIB_PROJECT_NAME=fakeservice
 
-. ./lib/init.sh
+LUM_USAGE_STACK=1
 
-USERLIBS="$(get_user_config_dir)/$SCRIPTNAME"
-TESTDIR="$(dirname $0)/_test"
+. "$TEST_LUM_CORE/lib/core.sh"
+
+lum::use::libdir "$TEST_ROOT/lib" ctrlib::
+lum::use ctrlib::core
+
+lum::user::appDir .ctrlib
+USERLIBS="$(lum::user::conf 1)"
 
 if [ "$1" = "--enable-env" ]; then
   mkdir -p $USERLIBS 2>/dev/null
@@ -19,13 +30,15 @@ elif [ "$1" = "--disable-env" ]; then
   exit 0
 fi
 
-use_lib docker web
-use_user_libs
-register_compose_commands
+unset USERLIBS
 
-use_app_libs "$TESTDIR/lib"
-use_app_conf "$TESTDIR/conf"
-use_lib example
-use_lib --conf example
+lum::use::libdir "$TEST_LIBS"
+lum::use::confdir "$TEST_CONF"
+lum::use example --conf example
 
-parse_commands "$@"
+ctrlib::docker::registerCompose
+lum::user::libs
+
+[ $# -eq 0 ] && ctrlib::usage
+
+lum::fn::run 1 "$@"

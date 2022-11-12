@@ -1,32 +1,59 @@
 ## Service functions.
 
-[ -z "$CTRLIB_INIT" ] && echo "Container init not loaded." && exit 100
+[ -z "$LUM_CORE" ] && echo "lum::core not loaded" && exit 100
 
-need_conf CTRLIB_SERVICE_NAME
+lum::var::need CTRLIB_SERVICE_NAME
+lum::use ctrlib::core
 
-register_command 'logs' 'read_logs' 1 "View service logs." "[-f]\nOptions:\n  -f   Follow the logs."
+lum::lib ctrlib::service $CTRLIB_VER
 
-register_systemctl_commands() {
-  register_command 'start' 'start_containers_sc' 1 "Start the $CTRLIB_SERVICE_NAME containers."
-  register_command 'stop' 'stop_containers_sc' 1 "Stop the $CTRLIB_SERVICE_NAME containers."
-  register_command 'restart' 'restart_containers_sc' 1 "Restart the $CTRLIB_SERVICE_NAME containers."
+lum::fn ctrlib::service::register
+#$
+#
+# Register start, stop, and restart commands using systemctl
+#
+ctrlib::service::register() {
+  local hide="${1:-0}"
+  lum::fn::alias ctrlib::service::start start CMD
+  lum::fn::alias ctrlib::service::stop stop CMD
+  lum::fn::alias ctrlib::service::restart restart CMD
+  lum::fn::alias ctrlib::service::logs logs CMD
 }
 
-start_containers_sc() {
+lum::fn ctrlib::service::start 0 -a start-service 0 0
+#$
+#
+# Start the service
+#
+ctrlib::service::start() {
   systemctl start $CTRLIB_SERVICE_NAME
 }
 
-stop_containers_sc() {
+lum::fn ctrlib::service::stop 0 -a stop-service 0 0
+#$
+#
+# Stop the service
+#
+ctrlib::service::stop() {
   systemctl stop $CTRLIB_SERVICE_NAME
 }
 
-restart_containers_sc() {
+lum::fn ctrlib::service::restart 0 -a restart-service 0 0
+#$
+#
+# Restart the service
+#
+ctrlib::service::restart() {
   systemctl restart $CTRLIB_SERVICE_NAME
 }
 
-read_logs() {
+lum::fn ctrlib::service::logs 0 -a service-logs 0 0
+#$ [[-f]]
+#
+# Get service logs
+#
+# ((-f))      Follow logs
+#
+ctrlib::service::logs() {
   journalctl -u $CTRLIB_SERVICE_NAME "$@"
 }
-
-mark_loaded service
-

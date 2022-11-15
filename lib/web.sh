@@ -105,7 +105,7 @@ lum::fn ctrlib::web::reload::nginx
 #
 # Reload a specified nginx container
 #
-ctrlib::web::reload::php() {
+ctrlib::web::reload::nginx() {
   [ $# -ne 1 ] && lum::help::usage
   docker exec $1 nginx -s reload
 }

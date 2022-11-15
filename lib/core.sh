@@ -23,7 +23,7 @@ lum::fn ctrlib::usage 0 -t 0 31 -a $SCRIPTNAME 1 0 -a --usage 0 0
 #@>lum::tmpl;
 #{{ctrlib::usage::list}}
 #
-# For detailed help on a command: ``help`` <<command>>
+#{{lum::help::moreinfo}}
 #
 ctrlib::usage() {
   echo -n "Usage: "

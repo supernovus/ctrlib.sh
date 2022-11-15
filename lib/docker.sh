@@ -103,7 +103,7 @@ lum::fn ctrlib::docker::enter 0 -A enter CMD
 # ((name))    The container name or alias.
 #
 ctrlib::docker::enter() {
-  [ "$#" -ne 1 ] && show_help -e enter
+  [ "$#" -ne 1 ] && lum::help::usage
   local CN="$(ctrlib::docker::get $1)"
   docker exec -it "$CN" /bin/bash
 }
@@ -133,7 +133,7 @@ lum::fn ctrlib::docker::reboot 0 -A reboot CMD
 # Restart a specified container
 #
 ctrlib::docker::reboot() {
-  [ "$#" -ne 1 ] && show_help -e restart-container
+  [ "$#" -ne 1 ] && lum::help::usage
   local CN="$(ctrlib::docker::get $1)"
   $DOCKER_COMPOSE restart "$CN"
 }

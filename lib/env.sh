@@ -1,90 +1,59 @@
 ## Build tools environment commands.
 
-[ -z "$CTRLIB_INIT" ] && echo "Container init not loaded." && exit 100
+[ -z "$LUM_CORE" ] && echo "lum::core not loaded" && exit 100
 
-need docker
+lum::use ctrlib::docker
 
-[ -n "$CTRLIB_ENV_LIB" ] && return
-CTRLIB_ENV_LIB=1
+lum::lib ctrlib::env $CTRLIB_VER
 
 [ -z "$CTRLIB_BT_IMAGE" ] && CTRLIB_BT_IMAGE="luminaryn/buildtools"
 [ -z "$CTRLIB_BT_NAME" ] && CTRLIB_BT_NAME="buildtools_session"
 [ -z "$CTRLIB_DOCKER_NET" ] && CTRLIB_DOCKER_NET="${CTRLIB_PROJECT_NAME}_default"
 
-register_command 'env' 'build_tools' 1 "Run buildtools commands."
-register_help_func 'build_tools' 'bt_help'
-register_command 'shell' 'build_tools_shell' 1 "Open a quick buildtools shell."
-register_help_func 'build_tools_shell' 'bt_shell_help'
-
-bt_help () {
-  echo "Build tools commands:"
-  echo
-  echo "  env enter [options...]      Enter a one-time buildtools container."
-  echo "  env start [options...]      Start a persistent buildtools container."
-  echo "  env stop                    Stop a running buildtools container."
-  echo "  env run [-i] ...            Run a command on a buildtools container."
-  echo "  env update                  Update the buildtools container."
-  echo
-  echo "Options for 'start' command:"
-  echo "  -t <to>   Container timeout (default '30m', MUST be first option.)"
-  echo
-  echo "Options for 'enter' and 'start' commands:"
-  echo "  -proj        Connect to the $CTRLIB_DOCKER_NET network."
-  echo "  -net <name>  Connect to the specified Docker network."
-  echo "  -v <mount>   Mount a volume (may be passed more than once.)"
-  echo "  -p <port>    Map a port (may be passed more than once.)"
-  if [ -n "$CTRLIB_BT_FLAGS" ]; then
-    echo
-    echo " The following options are always implicitly used:"
-    echo "  $CTRLIB_BT_FLAGS"
-  fi
-  echo
-  echo "Options for 'run' command:"
-  echo "  -i           Run the command interactively, like a shell."
-  exit 1
+lum::fn ctrlib::env 0 -t 0 13 -A env CMD
+#$ <<command>> `{...}`
+#
+# Run a BuildTools environment command
+#
+# Build tools commands:
+#
+#   **env enter** `{...}`         Enter a one-time buildtools container.
+#   **env shell**             A shell in ${CTRLIB_DOCKER_NET} net.
+#   **env start** `{...}`         Start a persistent buildtools container.
+#   **env stop**              Stop a running buildtools container.
+#   **env exec** `{...}`          Run a command on a buildtools container.
+#   **env run** `{...}`           Start a container and run a command on it.
+#   **env update**            Update the ${CTRLIB_BT_IMAGE} container.
+#
+# See ``env-enter``, ``env-start``, ``env-exec``, and ``env-run`` for details
+# on the arguments the corresponding commands accept.
+#
+ctrlib::env() {
+  [ $# -lt 1 ] && lum::help::usage
+  lum::fn::run 3 ctrlib::env:: "$@"
 }
 
-bt_shell_help () {
-  echo "Open a simple build tools shell with access to project network."
-  echo
-  echo "There are no options for this, as it's simply an alias to:"
-  echo
-  echo "  env enter -proj"
-  echo
-  exit 1
-}
-
-build_tools() {
-  [ $# -lt 1 ] && show_help -e env
-  BTCMD=$1
-  shift
-  case $BTCMD in
-    enter)
-      enter_buildtools "$@"
-    ;;
-    start)
-      start_buildtools "$@"
-    ;;
-    stop)
-      stop_buildtools "$@"
-    ;;
-    run)
-      exec_buildtools "$@"
-    ;;
-    update)
-      update_buildtools
-    ;;
-    *)
-      show_help -e env
-    ;;
-  esac
-}
-
-update_buildtools () {
+lum::fn ctrlib::env::update 0 -a env-update 1 0
+#$
+#
+# Update the buildtools container
+#
+ctrlib::env::update() {
   docker pull $CTRLIB_BT_IMAGE
 }
 
-run_buildtools () {
+lum::fn ctrlib::env::run 0 -a env-run 1 0
+#$ [[options...]] <<command>> [[params...]]
+#
+# Start a buildtools container, then run a command on it.
+#
+# ((options))      Options for the container environment.
+#              See ``env.opts`` for details.
+# ((command))      The command to run.
+#
+# ((params))       Parameters for the command.
+#
+ctrlib::env::run() {
   BT_CMD=/bin/bash
   BT_FLAGS="--rm"
   ARGS=""
@@ -134,43 +103,123 @@ run_buildtools () {
   docker run $BT_FLAGS $CTRLIB_BT_IMAGE $@
 }
 
-start_buildtools () {
+lum::fn ctrlib::env.opts 2 -t 0 15 -a env.opts 1 0
+#$
+#
+# Options for ``env-run`` and ``env-start``
+#
+# ``-n``      <<name>>    The name for the container.
+# ``-d``             Run in detached mode.
+# ``-i``             Run in interactive mode. 
+#                    Alias: ``-it``
+# ``-proj``          Run in ${CTRLIB_DOCKER_NET} network.
+#                    Alias: ``-db``
+# ``-host``          Run in **host** network (admin-only).
+# ``-net``    <<net>>    Run in specified network.
+# ``-v``      <<mount>>  Map a ``src:dest`` volume to the host.
+# ``-p``      <<port>>   Map a ``src:dest`` port to the host.
+#
+# Default flags: ${BT_FLAGS}
+#
+#: ctrlib::env.opts
+
+lum::fn ctrlib::env::start 0 -t 0 7 -a env-start 1 0
+#$ [[options...]]
+#
+# Start a persistent buildtools container
+#
+# ((options))      Options for the container.
+#              ``-t`` <<timeout>>  Timeout the container after a set time.
+#              Use `s,m,h,d` suffix to specify unit of time. Default: ``30m``
+#
+#              Also supports most options from ``env.opts``,
+#              **except**: ``-n`` and ``-d``, which are already specified.
+#
+ctrlib::env::start() {
   BT_TIMEOUT=30m
   if [ "$1" = "-t" ]; then
     BT_TIMEOUT="$2"
     shift;
     shift;
   fi
-  run_buildtools -d -n $CTRLIB_BT_NAME $@ /bin/sleep $BT_TIMEOUT
+  ctrlib::env::run -d -n $CTRLIB_BT_NAME $@ /bin/sleep $BT_TIMEOUT
 }
 
-stop_buildtools () {
+lum::fn ctrlib::env::stop 0 -a env-stop 1 0
+#$
+#
+# Stop the persistent buildtools container
+#
+ctrlib::env::stop() {
   docker kill $CTRLIB_BT_NAME
 }
 
-is_bt_running () {
-  list_containers | grep $CTRLIB_BT_NAME >/dev/null 2>&1
+lum::fn ctrlib::env::isRunning
+#$
+#
+# See if a persistent buildtools container is running
+#
+ctrlib::env::isRunning() {
+  ctrlib::docker::list | grep $CTRLIB_BT_NAME >/dev/null 2>&1
 }
 
-exec_buildtools () {
-  is_bt_running
+lum::fn ctrlib::env::exec 0 -a env-exec 1 0
+#$ [[options]] <<command>> [[params...]]
+# 
+# Run a command on a buildtools container.
+# If there is a persistent container running, this uses it.
+# Otherwise this forwards all arguments to ``env-run``.
+#
+# ((options))      Options for the execution environment.
+#                  ``-i | -it``  Run in interactive mode.
+#                  
+# ((command))      The command to run.
+#
+# ((params))       Parameters for the command.
+#
+ctrlib::env::exec() {
+  ctrlib::env::isRunning
   if [ $? -eq 0 ]; then
     FLAGS=""
     [ "$1" = "-i" -o "$1" = "-it" ] && FLAGS="-it" && shift;
-    docker exec $FLAGS $CTRLIB_BT_NAME $@
+    docker exec $FLAGS $CTRLIB_BT_NAME "$@"
   else
-    run_buildtools $@
+    ctrlib::env::run "$@"
   fi
 }
 
-enter_buildtools ()
+lum::fn ctrlib::env::enter 0 -a env-enter 1 0
+#$ [[options...]]
+#
+# Create a new buildtools environment and start a bash shell session
+#
+# ((options))      Options for the container environment.
+#              See ``env.opts`` for details.
+#              Note: ``-it`` is specified automatically.
+#
+ctrlib::env::enter()
 {
-  run_buildtools -it $@ /bin/bash
+  ctrlib::env::run -it "$@" /bin/bash
 }
 
-build_tools_shell () {
-  enter_buildtools -proj
+lum::fn ctrlib::env::shell 0 -a env-shell 1 0
+#$
+#
+# A bash shell with the ${CTRLIB_DOCKER_NET} network
+#
+# This is just an alias for ``env-enter -proj``
+#
+ctrlib::env::shell() {
+  ctrlib::env::enter -proj
 }
 
-mark_loaded env
-
+lum::fn ctrlib::env::root-shell 0 -a env-root-shell 1 0
+#$
+#
+# A bash shell with access to the **host** network and filesystem
+#
+# This is just an alias for ``env-enter -host -v /:/mnt/host``
+#
+ctrlib::env::root-shell() {
+  ctrlib::env::enter -host -v /:/mnt/host
+}

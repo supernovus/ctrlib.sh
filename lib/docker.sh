@@ -43,7 +43,7 @@ lum::fn ctrlib::docker::list 0 -A list CMD
 # Show a list of docker containers
 #
 ctrlib::docker::list() {
-  if [ "$#" -eq 0 ]; then
+  if [ $# -eq 0 ]; then
     docker ps --format "table {{.ID}}\t{{.Names}}"
   else
     docker ps "$@"
@@ -56,7 +56,7 @@ lum::fn ctrlib::docker::alias 0 -A container_alias CONF
 # Make an container alias for use in other commands.
 #
 ctrlib::docker::alias() {
-  [ $# -ne 2 ] && lum::help::usage
+  [ $# -lt 2 ] && lum::help::usage
   CTRLIB_DOCKER_ALIAS[$1]=$2
 }
 
@@ -70,7 +70,7 @@ lum::fn ctrlib::docker::get
 #         If it's already the real name it's returned as is.
 #
 ctrlib::docker::get() {
-  [ "$#" -ne 1 ] && echo "get_container <name>" && exit 181
+  [ $# -eq 0 ] && echo "get_container <name>" && exit 181
   if [ -n "${CTRLIB_DOCKER_ALIAS[$1]}" ]; then
     echo "${CTRLIB_DOCKER_ALIAS[$1]}"
   else
@@ -103,7 +103,7 @@ lum::fn ctrlib::docker::enter 0 -A enter CMD
 # ((name))    The container name or alias.
 #
 ctrlib::docker::enter() {
-  [ "$#" -ne 1 ] && lum::help::usage
+  [ $# -eq 0 ] && lum::help::usage
   local CN="$(ctrlib::docker::get $1)"
   docker exec -it "$CN" /bin/bash
 }
@@ -133,7 +133,7 @@ lum::fn ctrlib::docker::reboot 0 -A reboot CMD
 # Restart a specified container
 #
 ctrlib::docker::reboot() {
-  [ "$#" -ne 1 ] && lum::help::usage
+  [ $# -eq 0 ] && lum::help::usage
   local CN="$(ctrlib::docker::get $1)"
   $DOCKER_COMPOSE restart "$CN"
 }
@@ -176,3 +176,13 @@ ctrlib::docker::restart() {
   $DOCKER_COMPOSE restart
 }
 
+lum::fn ctrlib::docker::isRunning
+#$ <<name>>
+#
+# See if a persistent buildtools container is running
+#
+ctrlib::docker::isRunning() {
+  [ $# -eq 0 ] && lum::help::usage
+  local CN="$(ctrlib::docker::get $1)"
+  ctrlib::docker::list | grep -sq $CN
+}

@@ -9,7 +9,8 @@ lum::lib ctrlib::env $CTRLIB_VER
 [ -z "$CTRLIB_BT_IMAGE" ] && CTRLIB_BT_IMAGE="luminaryn/buildtools"
 [ -z "$CTRLIB_BT_NAME" ] && CTRLIB_BT_NAME="buildtools_session"
 [ -z "$CTRLIB_DOCKER_NET" ] && CTRLIB_DOCKER_NET="${CTRLIB_PROJECT_NAME}_default"
-[ -z "$CTRLIB_BT_FLAGS" ] && declare -a CTRLIB_BT_FLAGS=()
+
+declare -a CTRLIB_BT_FLAGS
  
 lum::fn ctrlib::env 0 -t 0 13 -A env CMD
 #$ <<command>> `{...}`
@@ -32,6 +33,16 @@ lum::fn ctrlib::env 0 -t 0 13 -A env CMD
 ctrlib::env() {
   [ $# -lt 1 ] && lum::help::usage
   lum::fn::run 3 ctrlib::env:: "$@"
+}
+
+lum::fn ctrlib::env::flags
+#$ <<args...>>
+#
+# Add all arguments as default BuildTools options.
+#
+ctrlib::env::flags() {
+  [ $# -eq 0 ] && lum::help::usage
+  CTRLIB_BT_FLAGS+=("$@")
 }
 
 lum::fn ctrlib::env::update 0 -a env-update 1 0

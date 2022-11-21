@@ -1,16 +1,15 @@
-## Build tools environment commands.
+#@lib: ctrlib::env
+#@desc: Build tools environment commands.
 
 [ -z "$LUM_CORE" ] && echo "lum::core not loaded" && exit 100
 
 lum::use ctrlib::docker
 
-lum::lib ctrlib::env $CTRLIB_VER
-
 [ -z "$CTRLIB_BT_IMAGE" ] && CTRLIB_BT_IMAGE="luminaryn/buildtools"
 [ -z "$CTRLIB_BT_NAME" ] && CTRLIB_BT_NAME="buildtools_session"
 [ -z "$CTRLIB_DOCKER_NET" ] && CTRLIB_DOCKER_NET="${CTRLIB_PROJECT_NAME}_default"
 
-declare -a CTRLIB_BT_FLAGS
+declare -ga CTRLIB_BT_FLAGS
  
 lum::fn ctrlib::env 0 -t 0 13 -A env CMD
 #$ <<command>> `{...}`

@@ -1,12 +1,13 @@
 #!/bin/bash
 
-[ -z "$TEST_LUM_CORE" ] && TEST_LUM_CORE=../lum-core
+TEST_BIN_DIR="$(dirname $0)"
+TEST_ROOT="$TEST_BIN_DIR/.."
 
-TEST_ROOT="$(dirname $0)"
+[ -z "$TEST_LUM_CORE" ] && TEST_LUM_CORE="$TEST_ROOT/../lum-core"
+
 TEST_CONF="$TEST_ROOT/_test/conf"
 TEST_LIBS="$TEST_ROOT/_test/lib"
 
-CTRLIB_CONTAINER_CONF=/etc/docker/fakeservice.yaml
 CTRLIB_PROJECT_NAME=fakeservice
 
 LUM_USAGE_STACK=1

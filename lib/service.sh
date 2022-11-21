@@ -1,11 +1,10 @@
-## Service functions.
+#@lib: ctrlib::service
+#@desc: systemd related functions
 
 [ -z "$LUM_CORE" ] && echo "lum::core not loaded" && exit 100
 
 lum::var::need CTRLIB_SERVICE_NAME
 lum::use ctrlib::core
-
-lum::lib ctrlib::service $CTRLIB_VER
 
 lum::fn ctrlib::service::register
 #$

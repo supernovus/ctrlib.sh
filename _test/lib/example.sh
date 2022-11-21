@@ -4,7 +4,7 @@
 
 lum::use docker
 
-lum::lib ctrlib::test::example $CTRLIB_VER
+ctrlib::docker::compose::conf /etc/docker/fakeservice.yaml
 
 lum::fn ctrlib::test::example::command 0 -a exam 1 CTRLIB_CMD_LIST
 #$ 

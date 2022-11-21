@@ -1,10 +1,11 @@
-## Web server container functions.
+#@lib: ctrlib::web
+#@desc: Web server container functions
 
 [ -z "$LUM_CORE" ] && echo "lum::core not loaded" && exit 100
 
 lum::use ctrlib::docker
 
-lum::lib ctrlib::web $CTRLIB_VER
+lum::var::need CTRLIB_PROJECT_NAME
 
 declare -a CTRLIB_PHP_CONTAINERS
 declare -a CTRLIB_NGINX_CONTAINERS

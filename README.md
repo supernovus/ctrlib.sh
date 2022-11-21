@@ -4,7 +4,7 @@ Libraries for controling container services.
 
 ## Requirements
 
-- Bash 4.0 or higher
+- Bash 4.4 or higher
 - [lum.core.sh](https://github.com/supernovus/lum.core.sh)
 
 ## Author

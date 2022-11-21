@@ -1,4 +1,5 @@
-## ctrlib::core
+#@lib: ctrlib::core
+#@decs: Control script library core
 
 [ -z "$LUM_CORE" ] && echo "lum::core not loaded" && exit 100
 
@@ -6,8 +7,6 @@ declare -gr CTRLIB_LIB_DIR=`dirname $BASH_SOURCE`
 declare -gr CTRLIB_VER=2.0.0
 declare -ga CTRLIB_CMD_LIST
 declare -gi CTRLIB_DEBUG=0
-
-lum::lib ctrlib::core $CTRLIB_VER
 
 lum::use lum::tmpl lum::user lum::themes::default
 

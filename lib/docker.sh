@@ -29,7 +29,7 @@ ctrlib::docker::compose::reset() {
   lum::flag::is $what $CO && CTRLIB_DOCKER_COMPOSE_OPTS=()
 }
 
-lum::fn ctrlib::docker::compose::opts -A compose_opts CONF
+lum::fn ctrlib::docker::compose::opts 0 -A compose_opts CONF
 #$ <<opts...>>
 #
 # Add all arguments as docker-compose options
@@ -39,7 +39,7 @@ ctrlib::docker::compose::opts() {
   CTRLIB_DOCKER_COMPOSE_OPTS+=("$@")
 }
 
-lum::fn ctrlib::docker::compose::conf -A compose_conf CONF
+lum::fn ctrlib::docker::compose::conf 0 -A compose_conf CONF
 #$ <<confFile...>>
 #
 # Add all arguments as docker-compose configuration files

@@ -234,13 +234,17 @@ ctrlib::docker::reboot() {
 }
 
 lum::fn ctrlib::docker::update 0 -A update CMD
-#$
+#$ [[opts]]
 #
 # Update container images
 #
+# ((opts))        Options for pull command
+#
 ctrlib::docker::update() {
-  echo "Updating containers."
-  ctrlib::docker::compose pull
+  local -a opts
+  [ "${#CTRLIB_DOCKER_PULL_OPTS[@]}" -gt 0 ] && opts=("${CTRLIB_DOCKER_PULL_OPTS[@]}")
+  echo "Updating containers..."
+  ctrlib::docker::compose pull "${opts[@]}"
   echo "Use 'sudo $SCRIPTNAME restart' to ensure newest containers are running."
 }
 

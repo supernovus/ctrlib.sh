@@ -218,7 +218,7 @@ lum::fn ctrlib::docker::compose 0 -a compose 0 0
 #
 ctrlib::docker::compose() {
   ctrlib::docker::compose::cmd
-  echo "» " "${CTRLIB_DOCKER_COMPOSE_CMD[@]}" "«" "$@"
+  #echo "» " "${CTRLIB_DOCKER_COMPOSE_CMD[@]}" "---" "$@"
   "${CTRLIB_DOCKER_COMPOSE_CMD[@]}" "$@"
 }
 

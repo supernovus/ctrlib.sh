@@ -66,15 +66,15 @@ ctrlib::web::reload() {
   if [ -n "$1" ]; then
     case $1 in
       php)
-        reload_php
+        ctrlib::web::php::reload
       ;;
       nginx)
-        reload_nginx
+        ctrlib::web::nginx::reload
       ;;
     esac
   else
-    reload_php
-    reload_nginx
+    ctrlib::web::php::reload
+    ctrlib::web::nginx::reload
   fi
 }
 

@@ -4,7 +4,6 @@
 [ -z "$LUM_CORE" ] && echo "lum::core not loaded" && exit 100
 
 declare -gr CTRLIB_LIB_DIR=`dirname $BASH_SOURCE`
-declare -gr CTRLIB_VER=2.0.0
 declare -ga CTRLIB_CMD_LIST
 declare -gi CTRLIB_DEBUG=0
 
@@ -36,7 +35,7 @@ lum::fn ctrlib::usage::list 0 -a commands 1 0 -a --commands 0 0
 # Show a list of CLI commands.
 #
 ctrlib::usage::list() {
-  lum::help::list CTRLIB_CMD_LIST 20 "-" " '" "'"
+  lum::help::list CTRLIB_CMD_LIST 20 "- " " '" "'"
 }
 
 lum::fn ctrlib::debug 

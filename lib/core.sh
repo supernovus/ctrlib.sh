@@ -35,7 +35,7 @@ lum::fn ctrlib::usage::list 0 -a commands 1 0 -a --commands 0 0
 # Show a list of CLI commands.
 #
 ctrlib::usage::list() {
-  lum::help::list CTRLIB_CMD_LIST 20 "- " " '" "'"
+  lum::help::list CTRLIB_CMD_LIST
 }
 
 lum::fn ctrlib::debug 

@@ -1,20 +1,15 @@
 #!/bin/bash
 
-TEST_BIN_DIR="$(dirname $0)"
-TEST_ROOT="$TEST_BIN_DIR/.."
+CTRLIB_BIN_DIR="$(dirname $0)"
+CTRLIB_ROOT="$TEST_BIN_DIR/.."
 
-[ -z "$TEST_LUM_CORE" ] && TEST_LUM_CORE="$TEST_ROOT/../lum-core"
-
-TEST_CONF="$TEST_ROOT/_test/conf"
-TEST_LIBS="$TEST_ROOT/_test/lib"
-
-CTRLIB_PROJECT_NAME=fakeservice
+[ -z "$CTRLIB_LUM_CORE" ] && CTRLIB_LUM_CORE="$CTRLIB_ROOT/../lum-core"
 
 LUM_USAGE_STACK=1
 
-. "$TEST_LUM_CORE/lib/core.sh"
+. "$CTRLIB_LUM_CORE/lib/core.sh"
 
-lum::use::libdir "$TEST_ROOT/lib" ctrlib::
+lum::use::libdir "$CTRLIB_ROOT/lib" ctrlib::
 lum::use ctrlib::core
 
 lum::user::appDir .ctrlib
@@ -33,8 +28,8 @@ fi
 
 unset USERLIBS
 
-lum::use::libdir "$TEST_LIBS"
-lum::use::confdir "$TEST_CONF"
+. "$CTRLIB_ROOT/_test/init.sh"
+
 lum::use example --conf example
 
 ctrlib::docker::registerCompose

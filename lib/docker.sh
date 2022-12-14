@@ -1,15 +1,12 @@
-#@lib: ctrlib::docker
-#@desc: Docker functions.
+#$< ctrlib::docker
+# Docker functions.
 
 [ -z "$LUM_CORE" ] && echo "lum::core not loaded" && exit 100
 
 lum::use ctrlib::core
 
-declare -gA CTRLIB_DOCKER_ALIAS
-
-declare -ga CTRLIB_DOCKER_COMPOSE_CMD
-declare -ga CTRLIB_DOCKER_COMPOSE_OPTS
-declare -ga CTRLIB_DOCKER_COMPOSE_CONF
+lum::var -P CTRLIB_DOCKER_ -A ALIAS \
+  -a COMPOSE_CMD COMPOSE_OPTS COMPOSE_CONF
 
 lum::fn ctrlib::docker::compose::reset 
 #$ <<what>>
@@ -49,10 +46,10 @@ ctrlib::docker::compose::conf() {
   CTRLIB_DOCKER_COMPOSE_CONF+=("$@")
 }
 
-lum::fn ctrlib::docker::compose::cmd 0 -t 0 7
+lum::fn ctrlib::docker::compose::cmd 0 -h 0 more
 #$ [[opts...]]
 #
-# Build/get the base **docker-compose** command line
+# Build/get the base $i(docker-compose); command line
 #
 # ((opts))         Options changing the behaviour.
 #              ``-f``           → If specified, always rebuild.
@@ -108,11 +105,8 @@ ctrlib::docker::compose::cmd() {
   return 0
 }
 
-lum::fn ctrlib::docker::registerCompose 
-#$
-#
-# Register start, stop, and restart commands using docker-compose
-#
+lum::fn ctrlib::docker::registerCompose 4
+#$ - Register start, stop, and restart commands using docker-compose
 ctrlib::docker::registerCompose() {
   local hide="${1:-0}"
   lum::fn::alias ctrlib::docker::start start CMD
@@ -172,10 +166,7 @@ ctrlib::docker::get() {
 }
 
 lum::fn ctrlib::docker::lsAlias
-#$
-#
-# List container aliases
-#
+#$ - List container aliases
 ctrlib::docker::lsAlias() {
   local key val 
   local AC="$(lum::colour cyan)" 
@@ -201,11 +192,8 @@ ctrlib::docker::enter() {
   docker exec -it "$CN" /bin/bash
 }
 
-lum::fn ctrlib::docker::clean 0 -A clean CMD
-#$
-#
-# Clean up stale container images
-#
+lum::fn ctrlib::docker::clean 4 -A clean CMD
+#$ - Clean up stale container images
 ctrlib::docker::clean() {
   docker rm -v $(docker ps --filter status=exited -q 2>/dev/null) 2>/dev/null
   docker rmi $(docker images --filter dangling=true -q 2>/dev/null) 2>/dev/null
@@ -248,29 +236,20 @@ ctrlib::docker::update() {
   echo "Use 'sudo $SCRIPTNAME restart' to ensure newest containers are running."
 }
 
-lum::fn ctrlib::docker::start 0 -a start-docker 0 0
-#$
-#
-# Start all containers with docker
-#
+lum::fn ctrlib::docker::start 4 -a start-docker 0 0
+#$ - Start all containers with docker
 ctrlib::docker::start() {
   ctrlib::docker::compose up
 }
 
-lum::fn ctrlib::docker::stop 0 -a stop-docker 0 0
-#$ 
-#
-# Stop all containers with docker
-#
+lum::fn ctrlib::docker::stop 4 -a stop-docker 0 0
+#$ - Stop all containers with docker
 ctrlib::docker::stop() {
   ctrlib::docker::compose down
 }
 
-lum::fn ctrlib::docker::restart 0 -a restart-docker 0 0
-#$
-#
-# Restart all containers with docker
-#
+lum::fn ctrlib::docker::restart 4 -a restart-docker 0 0
+#$ - Restart all containers with docker
 ctrlib::docker::restart() {
   ctrlib::docker::compose restart
 }

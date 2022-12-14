@@ -1,5 +1,5 @@
-#@lib: ctrlib::web
-#@desc: Web server container functions
+#$< ctrlib::web
+# Web server container functions
 
 [ -z "$LUM_CORE" ] && echo "lum::core not loaded" && exit 100
 
@@ -10,14 +10,14 @@ lum::var::need CTRLIB_PROJECT_NAME
 declare -a CTRLIB_PHP_CONTAINERS
 declare -a CTRLIB_NGINX_CONTAINERS
 
-lum::fn ctrlib::web::php 0 -t 0 13 -A php_container CONF
+lum::fn ctrlib::web::php 0 -A php_container CONF
 #$ [[container...]]
 #
 # Set the primary PHP container(s)
 #
 # ((container))      The container name to use.
 #                If not specified, we will look for one with the name:
-#                ``${CTRLIB_PROJECT_NAME}_php_1``
+#                ``$var(CTRLIB_PROJECT_NAME);_php_1``
 #
 ctrlib::web::php() {
   if [ $# -eq 0 ]; then
@@ -29,14 +29,14 @@ ctrlib::web::php() {
   fi
 }
 
-lum::fn ctrlib::web::nginx 0 -t 0 13 -A nginx_container CONF
+lum::fn ctrlib::web::nginx 0 -A nginx_container CONF
 #$ [[container...]]
 #
 # Set the primary nginx container(s)
 #
 # ((container))      The container name to use.
 #                If not specified, we will look for one with the name:
-#                ``${CTRLIB_PROJECT_NAME}_nginx_1``
+#                ``$var(CTRLIB_PROJECT_NAME);_nginx_1``
 #
 ctrlib::web::nginx() {
   if [ $# -eq 0 ]; then

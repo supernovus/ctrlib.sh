@@ -165,8 +165,9 @@ ctrlib::docker::get() {
   fi
 }
 
-lum::fn ctrlib::docker::lsAlias
+lum::fn ctrlib::docker::lsAlias 4
 #$ - List container aliases
+#
 ctrlib::docker::lsAlias() {
   local key val 
   local AC="$(lum::colour cyan)" 
@@ -194,6 +195,7 @@ ctrlib::docker::enter() {
 
 lum::fn ctrlib::docker::clean 4 -A clean CMD
 #$ - Clean up stale container images
+#
 ctrlib::docker::clean() {
   docker rm -v $(docker ps --filter status=exited -q 2>/dev/null) 2>/dev/null
   docker rmi $(docker images --filter dangling=true -q 2>/dev/null) 2>/dev/null
@@ -238,18 +240,21 @@ ctrlib::docker::update() {
 
 lum::fn ctrlib::docker::start 4 -a start-docker 0 0
 #$ - Start all containers with docker
+#
 ctrlib::docker::start() {
   ctrlib::docker::compose up
 }
 
 lum::fn ctrlib::docker::stop 4 -a stop-docker 0 0
 #$ - Stop all containers with docker
+#
 ctrlib::docker::stop() {
   ctrlib::docker::compose down
 }
 
 lum::fn ctrlib::docker::restart 4 -a restart-docker 0 0
 #$ - Restart all containers with docker
+#
 ctrlib::docker::restart() {
   ctrlib::docker::compose restart
 }

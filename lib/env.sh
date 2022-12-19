@@ -13,7 +13,7 @@ lum::var -P CTRLIB_BT_ \
   NET   =? "${CTRLIB_PROJECT_NAME}_default" \
   -a FLAGS
  
-lum::fn ctrlib::env 0 -A env CMD
+lum::fn ctrlib::env 0 -A env CMD -h opts more
 #$ <<command>> `{...}`
 #
 # Run a BuildTools environment command
@@ -46,10 +46,8 @@ ctrlib::env::flags() {
   CTRLIB_BT_FLAGS+=("$@")
 }
 
-lum::fn ctrlib::env::update 0 -a env-update 1 0
-#$
-#
-# Update the buildtools container
+lum::fn ctrlib::env::update 4 -a env-update 1 0
+#$ - Update the buildtools container
 #
 ctrlib::env::update() {
   docker pull $CTRLIB_BT_IMAGE
@@ -61,7 +59,7 @@ lum::fn ctrlib::env::run 0 -a env-run 1 0
 # Start a buildtools container, then run a command on it.
 #
 # ((options))      Options for the container environment.
-#              See ``env.opts`` for details.
+#              See $see(env,opts); for details.
 # ((command))      The command to run.
 #
 # ((params))       Parameters for the command.
@@ -116,10 +114,7 @@ ctrlib::env::run() {
   docker run "${btFlags[@]}" $CTRLIB_BT_IMAGE "$@"
 }
 
-lum::fn ctrlib::env.opts 2 -a env.opts 1 0 -h 0 more
-#$
-#
-# Options for ``env-run`` and ``env-start``
+#$ ctrlib::env,opts - Options for ``env-run`` and ``env-start``
 #
 # ``-n``      <<name>>    The name for the container.
 # ``-d``             Run in detached mode.
@@ -134,7 +129,7 @@ lum::fn ctrlib::env.opts 2 -a env.opts 1 0 -h 0 more
 #
 # Default flags: $var(CTRLIB_BT_FLAGS);
 #
-#: ctrlib::env.opts
+#: ctrlib::env,opts
 
 lum::fn ctrlib::env::start 0 -a env-start 1 0 -h 0 more
 #$ [[options...]]
@@ -145,7 +140,7 @@ lum::fn ctrlib::env::start 0 -a env-start 1 0 -h 0 more
 #              ``-t`` <<timeout>>  Timeout the container after a set time.
 #              Use `s,m,h,d` suffix to specify unit of time. Default: ``30m``
 #
-#              Also supports most options from ``env.opts``,
+#              Also supports most options from $see(env,opts);,
 #              $b(except);: ``-n`` and ``-d``, which are already specified.
 #
 ctrlib::env::start() {
@@ -160,12 +155,14 @@ ctrlib::env::start() {
 
 lum::fn ctrlib::env::stop 4 -a env-stop 1 0
 #$ - Stop the persistent buildtools container
+#
 ctrlib::env::stop() {
   docker kill $CTRLIB_BT_NAME
 }
 
 lum::fn ctrlib::env::isRunning 4
 #$ - See if a persistent buildtools container is running
+#
 ctrlib::env::isRunning() {
   ctrlib::docker::isRunning $CTRLIB_BT_NAME
 }

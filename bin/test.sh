@@ -1,15 +1,14 @@
 #!/bin/bash
 
-CTRLIB_BIN_DIR="$(dirname $0)"
-CTRLIB_ROOT="$TEST_BIN_DIR/.."
+CTRLIB_TEST_SH="$(realpath -e "$0")"
+CTRLIB_BIN_DIR="$(dirname "$CTRLIB_TEST_SH")"
+CTRLIB_PKG_DIR="$(dirname "$CTRLIB_BIN_DIR")"
 
-[ -z "$CTRLIB_LUM_CORE" ] && CTRLIB_LUM_CORE="$CTRLIB_ROOT/../lum-core"
-
-LUM_USAGE_STACK=1
+[ -z "$CTRLIB_LUM_CORE" ] && CTRLIB_LUM_CORE="$CTRLIB_PKG_DIR/../lum-core"
 
 . "$CTRLIB_LUM_CORE/lib/core.sh"
 
-lum::use::libdir "$CTRLIB_ROOT/lib" ctrlib::
+lum::use::libdir "$CTRLIB_PKG_DIR/lib" ctrlib::
 lum::use ctrlib::core
 
 lum::user::appDir .ctrlib
@@ -28,7 +27,7 @@ fi
 
 unset USERLIBS
 
-. "$CTRLIB_ROOT/_test/init.sh"
+. "$CTRLIB_PKG_DIR/_test/init.sh"
 
 lum::use example --conf example
 

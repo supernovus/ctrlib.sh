@@ -6,7 +6,7 @@
 lum::use ctrlib::core
 
 lum::var -P CTRLIB_DOCKER_ -A ALIAS \
-  -a COMPOSE_CMD COMPOSE_OPTS COMPOSE_CONF
+  -a COMPOSE_CMD COMPOSE_OPTS COMPOSE_CONF PULL_OPTS
 
 lum::fn ctrlib::docker::compose::reset 
 #$ <<what>>

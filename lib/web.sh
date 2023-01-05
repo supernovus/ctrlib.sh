@@ -5,8 +5,6 @@
 
 lum::use ctrlib::docker
 
-lum::var::need CTRLIB_PROJECT_NAME
-
 declare -a CTRLIB_PHP_CONTAINERS
 declare -a CTRLIB_NGINX_CONTAINERS
 
@@ -15,15 +13,12 @@ lum::fn ctrlib::web::php 0 -A php_container CONF
 #
 # Set the primary PHP container(s)
 #
-# ((container))      The container name to use.
-#                If not specified, we will look for one with the name:
-#                ``$var(CTRLIB_PROJECT_NAME);_php_1``
+# ((container))      The container name or alias to use.
+#                If not specified, we'll assume an alias of ``php``.
 #
 ctrlib::web::php() {
   if [ $# -eq 0 ]; then
-    local CN="${CTRLIB_PROJECT_NAME}_php_1"
-    CTRLIB_PHP_CONTAINERS+=("$CN")
-    ctrlib::docker::alias php "$CN"
+    CTRLIB_PHP_CONTAINERS+=("php")
   else
     CTRLIB_PHP_CONTAINERS+=("$@")
   fi
@@ -35,14 +30,11 @@ lum::fn ctrlib::web::nginx 0 -A nginx_container CONF
 # Set the primary nginx container(s)
 #
 # ((container))      The container name to use.
-#                If not specified, we will look for one with the name:
-#                ``$var(CTRLIB_PROJECT_NAME);_nginx_1``
+#                If not specified, we'll assume an alias of ``nginx``.
 #
 ctrlib::web::nginx() {
   if [ $# -eq 0 ]; then
-    local CN="${CTRLIB_PROJECT_NAME}_nginx_1"
-    CTRLIB_NGINX_CONTAINERS+=("$CN")
-    ctrlib::docker::alias nginx "$CN"
+    CTRLIB_NGINX_CONTAINERS+=("nginx")
   else
     CTRLIB_NGINX_CONTAINERS+=("$@")
   fi
@@ -85,7 +77,8 @@ lum::fn ctrlib::web::reload::php
 #
 ctrlib::web::reload::php() {
   [ $# -ne 1 ] && lum::help::usage
-  docker exec $1 /bin/bash -c 'kill -USR2 1'
+  local container="$(ctrlib::docker::get "$1")"
+  docker exec "$container" /bin/bash -c 'kill -USR2 1'
 }
 
 lum::fn ctrlib::web::php::reload
@@ -97,7 +90,7 @@ lum::fn ctrlib::web::php::reload
 ctrlib::web::php::reload() {
   local cont
   for cont in "${CTRLIB_PHP_CONTAINERS[@]}"; do
-    ctrlib::web::reload::php $cont
+    ctrlib::web::reload::php "$cont"
   done
 }
 
@@ -108,7 +101,8 @@ lum::fn ctrlib::web::reload::nginx
 #
 ctrlib::web::reload::nginx() {
   [ $# -ne 1 ] && lum::help::usage
-  docker exec $1 nginx -s reload
+  local container="$(ctrlib::docker::get "$1")"
+  docker exec "$container" nginx -s reload
 }
 
 lum::fn ctrlib::web::nginx::reload
@@ -120,6 +114,6 @@ lum::fn ctrlib::web::nginx::reload
 ctrlib::web::nginx::reload() {
   local cont
   for cont in "${CTRLIB_NGINX_CONTAINERS[@]}"; do
-    ctrlib::web::reload::nginx $cont
+    ctrlib::web::reload::nginx "$cont"
   done
 }

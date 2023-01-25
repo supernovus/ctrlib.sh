@@ -21,7 +21,7 @@ lum::fn ctrlib::env 0 -A env CMD -h opts more
 # Build tools commands:
 #
 #   $i(enter); `{...}`         Enter a one-time buildtools container.
-#   $i(shell);             A shell in $var(CTRLIB_DOCKER_NET); net.
+#   $i(shell);             A shell in $var(CTRLIB_BT_NET); net.
 #   $i(start); `{...}`         Start a persistent buildtools container.
 #   $i(stop);              Stop a running buildtools container.
 #   $i(exec); `{...}`          Run a command on a buildtools container.
@@ -84,7 +84,7 @@ ctrlib::env::run() {
         shift
       ;;
       -proj|-db)
-        btFlags+=('--net' "$CTRLIB_DOCKER_NET")
+        btFlags+=('--net' "$CTRLIB_BT_NET")
         shift
       ;;
       -host)

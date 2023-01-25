@@ -120,7 +120,7 @@ ctrlib::env::run() {
 # ``-d``             Run in detached mode.
 # ``-i``             Run in interactive mode. 
 #                    Alias: ``-it``
-# ``-proj``          Run in $var(CTRLIB_DOCKER_NET); network.
+# ``-proj``          Run in $var(CTRLIB_BT_NET); network.
 #                    Alias: ``-db``
 # ``-host``          Run in **host** network (admin-only).
 # ``-net``    <<net>>    Run in specified network.
@@ -209,7 +209,7 @@ ctrlib::env::enter()
 lum::fn ctrlib::env::shell 0 -a env-shell 1 0
 #$
 #
-# A bash shell with the $var(CTRLIB_DOCKER_NET); network
+# A bash shell with the $var(CTRLIB_BT_NET); network
 #
 # This is just an alias for ``env-enter -proj``
 #

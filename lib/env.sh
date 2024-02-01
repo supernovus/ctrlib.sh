@@ -198,7 +198,7 @@ lum::fn ctrlib::env::enter 0 -a env-enter 1 0
 # Create a new buildtools environment and start a bash shell session
 #
 # ((options))      Options for the container environment.
-#              See ``env.opts`` for details.
+#              See ``env,opts`` for details.
 #              Note: ``-it`` is specified automatically.
 #
 ctrlib::env::enter()

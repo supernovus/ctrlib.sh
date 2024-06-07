@@ -176,7 +176,7 @@ ctrlib::docker::lsAlias() {
   for key in ${!CTRLIB_DOCKER_ALIAS[@]}
   do 
     val=${CTRLIB_DOCKER_ALIAS[$key]}
-    echo "$AC$(lum::str::pad 20 "$key")$EC → $VC$val$EC"    
+    echo "$AC$(lum::str::pad -20 "$key")$EC → $VC$val$EC"    
   done
 }
 
